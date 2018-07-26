@@ -27,10 +27,12 @@ io.on('connection', (socket) => {
   socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
 
   // Getting a message from a user and log it
-  socket.on('createMessage', (message) => {
+  socket.on('createMessage', (message, callback) => {
     console.log('createMessage', message);
     // Send that data to all connected users
     io.emit('newMessage', generateMessage(message.from, message.text));
+    // Send confirmation to client
+    callback('this is from the server');
   });
 
   // Log a message if a user was disconnected

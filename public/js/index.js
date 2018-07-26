@@ -13,8 +13,20 @@ socket.on('disconnect', function () {
 // Log that a message from server received
 socket.on('newMessage', function (message) {
   console.log('newMessage', message);
+  const ul = document.getElementById('messages');
+  const li = document.createElement('li');
+  li.innerHTML = `<li>${message.from}: ${message.text}</li>`;
+  ul.appendChild(li);
 });
 
-/* To emit a custom event from console of the Google Dev tools:
-> socket.emit('createMessage', {from: 'Billy', text: 'This is Billy Bones'});
-*/
+document.getElementById('message-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  let name = document.querySelector('[name=message]');
+  socket.emit('createMessage', {
+    from: 'User',
+    text: name.value
+  }, function (data) {
+    // Get acknowledgement from server
+    console.log('Roger!', data);
+  });
+});
