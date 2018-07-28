@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
-const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 const publicPath = path.join(__dirname, '../public');
 
 // For Heroku deployment
@@ -35,11 +35,18 @@ io.on('connection', (socket) => {
     callback('this is from the server');
   });
 
+  // Getting a message with user's location
+  socket.on('createLocationMessage', (coords) => {
+    // Send that data to all connected users
+    io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
+  });
+
   // Log a message if a user was disconnected
   socket.on('disconnect', () => {
     console.log('User was disconnected');
   });
 });
+
 
 server.listen(port, () => {
   console.log(`Server is up on ${port}`);
