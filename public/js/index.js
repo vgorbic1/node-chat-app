@@ -3,6 +3,24 @@ var socket = io();
 const ul = document.getElementById('messages');
 const locationButton = document.getElementById('send-location');
 
+// Scroll to bottom when messages occupy
+// full width of the page
+function scrollToBottom() {
+  var messages = document.getElementById('messages');
+  var newMessage = messages.lastElementChild;
+  var clientHeight = messages.clientHeight;
+  var scrollTop = messages.scrollTop;
+  var scrollHeight = messages.scrollHeight;
+  var newMessageHeight = newMessage.clientHeight;
+  var lastMessageHeight = 0;
+  if (newMessage.previousElementSibling) {
+    lastMessageHeight = newMessage.previousElementSibling.clientHeight;
+  }
+  if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+    messages.scrollTop = scrollHeight;
+  }
+}
+
 // Log that connection was set successfully
 socket.on('connect', function () {
   console.log('Connected to server');
@@ -23,6 +41,7 @@ socket.on('newMessage', function (message) {
     createdAt: formattedTime
   });
   ul.insertAdjacentHTML('beforeend', html);
+  scrollToBottom();
 });
 
 // Create a message with user's current location 
@@ -35,6 +54,7 @@ socket.on('newLocationMessage', function (message) {
     createdAt: formattedTime
   });
   ul.insertAdjacentHTML('beforeend', html);
+  scrollToBottom();
 });
 
 document.getElementById('message-form').addEventListener('submit', function (e) {
