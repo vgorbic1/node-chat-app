@@ -19,16 +19,52 @@ function scrollToBottom() {
   if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
     messages.scrollTop = scrollHeight;
   }
+};
+
+// Get parameters as an object 
+// from the join form
+function deparam(uri) {
+  if (uri === undefined) {
+    uri = window.location.search;
+  }
+  var queryString = {};
+  uri.replace(
+    new RegExp(
+      "([^?=&]+)(=([^&#]*))?", "g"),
+      function ($0, $1, $2, $3) {
+        queryString[$1] = decodeURIComponent($3.replace(/\+/g, '%20'));
+      }
+    );
+  return queryString;
 }
 
-// Log that connection was set successfully
+// Connect with scpecified room
 socket.on('connect', function () {
-  console.log('Connected to server');
+  var params = deparam(window.location.search);
+
+  socket.emit('join', params, function (err) {
+    if (err) {
+      alert(err);
+      window.location.href = '/';
+    } else {
+      document.title = `Chat | ${params.room}`;
+    }
+  });
 });
 
 // Log that disconnection happend
 socket.on('disconnect', function () {
   console.log('Disconnected from server');
+});
+
+// Update current list of users
+socket.on('updateUserList', function (users) {
+  var content = '<ol>';
+  users.forEach(function (user) {
+    content += `<li>${user}</li>`;
+  });
+  content += '</ol>';
+  document.getElementById('users').innerHTML = content;
 });
 
 // Log that a message from server received
@@ -60,10 +96,7 @@ socket.on('newLocationMessage', function (message) {
 document.getElementById('message-form').addEventListener('submit', function (e) {
   e.preventDefault();
   let messageInput = document.querySelector('[name=message]');
-  socket.emit('createMessage', {
-    from: 'User',
-    text: messageInput.value
-  }, function (data) {
+  socket.emit('createMessage', {text: messageInput.value}, function (data) {
     // Get acknowledgement from server
     messageInput.value = '';
     messageInput.focus();
