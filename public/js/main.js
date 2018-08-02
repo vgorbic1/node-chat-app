@@ -1,7 +1,7 @@
 var socket = io();
 
 const ul = document.getElementById('messages');
-const locationButton = document.getElementById('send-location');
+const locationticket = document.getElementById('send-location');
 
 // Scroll to bottom when messages occupy
 // full width of the page
@@ -38,16 +38,16 @@ function deparam(uri) {
   return queryString;
 }
 
-// Connect with scpecified room
+// Connect with scpecified ticket
 socket.on('connect', function () {
   var params = deparam(window.location.search);
-
   socket.emit('join', params, function (err) {
     if (err) {
       alert(err);
-      window.location.href = '/';
+      window.location.href = '/'; 
     } else {
-      document.title = `Chat | ${params.room}`;
+      document.title = `Support Chat | Ticket ${params.ticket}`;
+      document.getElementById('ticket').innerHTML = `Ticket: ${params.ticket}`;
     }
   });
 });
@@ -59,11 +59,11 @@ socket.on('disconnect', function () {
 
 // Update current list of users
 socket.on('updateUserList', function (users) {
-  var content = '<ol>';
+  var content = '<ul>';
   users.forEach(function (user) {
     content += `<li>${user}</li>`;
   });
-  content += '</ol>';
+  content += '</ul>';
   document.getElementById('users').innerHTML = content;
 });
 
@@ -103,24 +103,24 @@ document.getElementById('message-form').addEventListener('submit', function (e) 
   });
 });
 
-locationButton.addEventListener('click', function () {
+locationticket.addEventListener('click', function () {
   if (!navigator.geolocation) {
     return alert('Geolocation not supported by your browser.');
   }
 
-  locationButton.setAttribute('disabled', 'disabled');
-  locationButton.textContent = 'Sending...';
+  locationticket.setAttribute('disabled', 'disabled');
+  locationticket.textContent = 'Sending...';
 
   navigator.geolocation.getCurrentPosition(function (position) {
-    locationButton.removeAttribute('disabled');
-    locationButton.textContent = 'Send location';
+    locationticket.removeAttribute('disabled');
+    locationticket.textContent = 'Send location';
     socket.emit('createLocationMessage', {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude
     });
   }, function () {
-    locationButton.removeAttribute('disabled')
-    locationButton.textContent = 'Send location';
+    locationticket.removeAttribute('disabled')
+    locationticket.textContent = 'Location';
     alert('Unable to fetch location.');
   });
 });

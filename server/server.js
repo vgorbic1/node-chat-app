@@ -18,25 +18,30 @@ var users = new Users();
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
-  console.log('New user connected');
 
   socket.on('join', (params, callback) => {
-    if (!isRealString(params.name) || !isRealString(params.room)) {
-      return callback('Name and room name are required.');
+    if (!isRealString(params.name) || !isRealString(params.ticket)) {
+      return callback('Name and ticket number are required.');
     }
-    socket.join(params.room);
+    // if (!isCorrectTicket(params.ticket)) {
+    //   return callback('The ticket number is incorrect.');
+    // }
+
+    // Strip log name
+    params.name = (params.name.length > 18) ? params.name.slice(0, 18) : params.name;
+    socket.join(params.ticket);
     users.removeUser(socket.id);
-    users.addUser(socket.id, params.name, params.room);
-    io.to(params.room).emit('updateUserList', users.getUserList(params.room));
-    socket.emit('newMessage', generateMessage('Admin', `${params.name}, welcome to the chat.`));
-    socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined.`));
+    users.addUser(socket.id, params.name, params.ticket);
+    io.to(params.ticket).emit('updateUserList', users.getUserList(params.ticket));
+    socket.emit('newMessage', generateMessage('Support', `${params.name}, welcome to the customer support. How can we help you?`));
+    socket.broadcast.to(params.ticket).emit('newMessage', generateMessage('Support', `${params.name} has joined.`));
     callback();
   });
 
   socket.on('createMessage', (message, callback) => {
     var user = users.getUser(socket.id);
     if (user && isRealString(message.text)) {
-      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+      io.to(user.ticket).emit('newMessage', generateMessage(user.name, message.text));
     } 
     callback();
   });
@@ -44,19 +49,18 @@ io.on('connection', (socket) => {
   socket.on('createLocationMessage', (coords) => {
     var user = users.getUser(socket.id);
     if (user) {
-      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
+      io.to(user.ticket).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
     }
   });
 
   socket.on('disconnect', () => {
     var user = users.removeUser(socket.id);
     if (user) {
-      io.to(user.room).emit('updateUserList', users.getUserList(user.room));
-      io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
+      io.to(user.ticket).emit('updateUserList', users.getUserList(user.ticket));
+      io.to(user.ticket).emit('newMessage', generateMessage('Support', `${user.name} has left.`));
     }
   });
 });
-
 
 server.listen(port, () => {
   console.log(`Server is up on ${port}`);

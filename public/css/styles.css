@@ -23,6 +23,7 @@ button:hover {
 button {
   background :#265f82;
   cursor: pointer;
+  text-transform: uppercase;
   transition: all .3s ease;
 }
 
@@ -41,9 +42,13 @@ li, ul {
 }
 
 h3 {
-  font-weight: 600;
+  font-weight: 400;
   text-align: center;
-  font-size: 1.5rem
+  font-size: 1.4rem
+}
+
+h3.ticket {
+  text-align: left;
 }
 
 .centered-form {
@@ -54,8 +59,8 @@ h3 {
   justify-content: center;
   background: linear-gradient(
     125deg,
-    rgba(39,107,130,1) 0,
-    rgba(49,84,129,1) 100%
+    rgba(167,207,223) 0,
+    rgba(35,83,138) 100%
   );
 }
 
@@ -64,7 +69,9 @@ h3 {
   border: 1px solid #e1e1e1;
   border-radius: 5px;
   padding: 0 20px;
-  margin:20px; width:230px
+  margin: 20px;
+  width: 260px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .form-field {
@@ -95,19 +102,19 @@ h3 {
   width: 260px;
   height: 100vh;
   background: linear-gradient(
-    325deg,rgba(39,107,130,1) 0,
-    rgba(49,84,129,1) 100%
+    325deg,rgba(167,207,223) 0,
+    rgba(35,83,138) 100%
   )
 }
 
 .chat__footer,
 .chat__sidebar li {
-  background :#e6eaee;
+  background :#eaeaee;
   padding:10px
 }
 
 .chat__sidebar h3 {
-  color: #e6eaee;
+  color: #eaeaee;
   margin: 10px 20px;
   text-align: left
 }
